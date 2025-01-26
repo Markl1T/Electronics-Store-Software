@@ -16,13 +16,13 @@ public abstract class User implements Serializable {
 	private double currentSalary;
 	
 	public User(String username, String password, String name, String phoneNumber, String email,
-			LocalDate dateOfBirth, double salary) throws InvalidSalaryException, InvalidEmailException {
+			LocalDate dateOfBirth, double salary) throws InvalidSalaryException, InvalidEmailException, InvalidDateException {
 		this.username = username;
 		this.password = password;
 		this.name = name;
 		this.phoneNumber = phoneNumber;
 		setEmail(email);
-		this.dateOfBirth = dateOfBirth;
+		setDateOfBirth(dateOfBirth);
 		setCurrentSalary(salary);
 	}
 	
@@ -64,6 +64,13 @@ public abstract class User implements Serializable {
 	
 	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
+	}
+	
+	public void setDateOfBirth(LocalDate dateOfBirth) throws InvalidDateException {
+		if(dateOfBirth.isAfter(LocalDate.now())) {
+			throw new InvalidDateException("Invalid Date");
+		}
+		this.dateOfBirth = dateOfBirth;
 	}
 	
 	public double getCurrentSalary() {

@@ -5,6 +5,7 @@ import view.AdministratorView;
 import view.LoginView;
 import model.Administrator;
 import model.Cashier;
+import model.InvalidDateException;
 import model.Manager;
 import model.Salary;
 import model.Sector;
@@ -56,40 +57,57 @@ public class AdministratorController {
 	}
 
 	public static void handleNewEmployee(AdministratorView pane) {
-		AdministratorNewEmployeePane newEmployeePane = pane.getNewEmployeePane();
-		try {
-			ArrayList<Sector> sectorList = FileHandler.readFile(FileHandler.SECTOR);
-			newEmployeePane.getSectorComboBox().getItems().addAll(sectorList);
-		} catch (Exception ex) {
-			showException(ex.getMessage(), pane);
-		}
+	    AdministratorNewEmployeePane newEmployeePane = pane.getNewEmployeePane();
+	    try {
+	        ArrayList<Sector> sectorList = FileHandler.readFile(FileHandler.SECTOR);
+	        newEmployeePane.getSectorComboBox().getItems().addAll(sectorList);
+	    } catch (Exception ex) {
+	        showException(ex.getMessage(), pane);
+	    }
 
-		newEmployeePane.getRoleComboBox().setOnAction(e -> newEmployeePane.getSectorComboBox()
-				.setDisable(newEmployeePane.getRoleComboBox().getValue().equals("Manager")));
+	    newEmployeePane.getRoleComboBox().setOnAction(e -> newEmployeePane.getSectorComboBox()
+	            .setDisable(newEmployeePane.getRoleComboBox().getValue().equals("Manager")));
 
-		newEmployeePane.getRegisterButton().setOnAction(e -> {
-			try {
-				String role = newEmployeePane.getRoleComboBox().getValue();
-				String username = newEmployeePane.getUsernameField().getText();
-				String password = newEmployeePane.getPasswordField().getText();
-				String name = newEmployeePane.getNameField().getText();
-				String phoneNumber = newEmployeePane.getPhoneNumberField().getText();
-				String email = newEmployeePane.getEmailField().getText();
-				LocalDate birthdate = newEmployeePane.getBirthdatePicker().getValue();
-				double salary = Double.parseDouble(newEmployeePane.getSalaryField().getText());
-				Sector sector = newEmployeePane.getSectorComboBox().getValue();
-				FileHandler.registerEmployee(role, username, password, name, phoneNumber, email, birthdate, salary,
-						sector);
-				if (role.equals("Cashier")) {
-					pane.showCashiersView();
-				} else {
-					pane.showManagersView();
-				}
-			} catch (Exception ex) {
-				showException(ex.getMessage(), pane);
-			}
-		});
+	    newEmployeePane.getRegisterButton().setOnAction(e -> {
+	        try {
+	            String role = newEmployeePane.getRoleComboBox().getValue();
+	            String username = newEmployeePane.getUsernameField().getText();
+	            String password = newEmployeePane.getPasswordField().getText();
+	            String name = newEmployeePane.getNameField().getText();
+	            String phoneNumber = newEmployeePane.getPhoneNumberField().getText();
+	            String email = newEmployeePane.getEmailField().getText();
+	            LocalDate birthdate = newEmployeePane.getBirthdatePicker().getValue();
+	            String salaryText = newEmployeePane.getSalaryField().getText();
+	            Sector sector = newEmployeePane.getSectorComboBox().getValue();
+
+	            if (username.isEmpty() || password.isEmpty() || name.isEmpty() || phoneNumber.isEmpty() || 
+	                email.isEmpty() || birthdate == null || salaryText.isEmpty() || sector == null) {
+	                showException("All fields must be filled.", pane);
+	                return; 
+	            }
+
+	            double salary;
+	            try {
+	                salary = Double.parseDouble(salaryText);
+	            } catch (NumberFormatException ex) {
+	                showException("Salary must be a valid number.", pane);
+	                return;
+	            }
+
+	            FileHandler.registerEmployee(role, username, password, name, phoneNumber, email, birthdate, salary, sector);
+
+	            if (role.equals("Cashier")) {
+	                pane.showCashiersView();
+	            } else {
+	                pane.showManagersView();
+	            }
+	        } catch (Exception ex) {
+	            showException(ex.getMessage(), pane);
+	        }
+	    });
 	}
+
+
 
 	public static void handleNewSector(AdministratorView pane) {
 		AdministratorNewSectorPane newSectorPane = pane.getNewSectorPane();
@@ -104,6 +122,10 @@ public class AdministratorController {
 			try {
 				String name = newSectorPane.getNameField().getText();
 				Manager manager = newSectorPane.getManagerComboBox().getValue();
+				if(name.isEmpty() || manager == null) {
+					showException("All fields must be filled.", pane);
+					return;
+				}
 				Sector sector = new Sector(name, manager);
 				FileHandler.appendFile(FileHandler.SECTOR, sector);
 				pane.showSectorsView();
@@ -365,7 +387,15 @@ public class AdministratorController {
 		statsPane.getStatsDateSelector().getEnterButton().setOnAction(e -> {
 			LocalDate startDate = statsPane.getStatsDateSelector().getStartDatePicker().getValue();
 			LocalDate endDate = statsPane.getStatsDateSelector().getEndDatePicker().getValue();
+			
 			try {
+				if (startDate == null || endDate == null) {
+					throw new InvalidDateException("Both Start and End Date must be selected.");
+				} else if (startDate.isAfter(endDate)) {
+					throw new InvalidDateException("Start Date must be before End Date.");
+				} else if (startDate.isAfter(LocalDate.now()) || endDate.isAfter(LocalDate.now())) {
+					throw new InvalidDateException("Invalid Date");
+				}
 				statsPane.getItemCostsField().setText(StatisticsDAO.getItemCosts(startDate, endDate) + "");
 				statsPane.getStaffCostsField().setText(StatisticsDAO.getStaffCosts(startDate, endDate) + "");
 				statsPane.getTotalCostsField().setText(StatisticsDAO.getTotalCosts(startDate, endDate) + "");
@@ -378,7 +408,7 @@ public class AdministratorController {
 
 	}
 
-	public static void handleProfile(AdministratorView pane) {
+	public static void handleChangePassword(AdministratorView pane) {
 		pane.getChangePasswordPane().getChangePasswordButton().setOnAction(e -> {
 			try {
 				String newPassword = pane.getChangePasswordPane().getPasswordField().getText();

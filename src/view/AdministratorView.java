@@ -137,7 +137,7 @@ public class AdministratorView extends BorderPane{
 		this.changePasswordPane = new AdministratorChangePasswordPane();
 		setCenter(changePasswordPane);
 		exceptionLabel.setText("");
-		AdministratorController.handleProfile(this);
+		AdministratorController.handleChangePassword(this);
 	}
 	
 	public Administrator getAdministrator() {
