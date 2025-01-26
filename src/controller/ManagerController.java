@@ -167,6 +167,9 @@ public class ManagerController {
 				Category category = newItemPane.getCategoryComboBox().getValue();
 				Supplier supplier = newItemPane.getSupplierComboBox().getValue();
 				Double sellingPrice = Double.parseDouble(newItemPane.getSellingPriceField().getText());
+				if(name.isEmpty() || category == null || supplier == null) {
+					throw new IllegalArgumentException("All fields must be filled");
+				}
 				Item newItem = new Item(name, category, supplier, sellingPrice);
 				FileHandler.appendFile(FileHandler.ITEM, newItem);
 				pane.showItemsView();
@@ -197,6 +200,9 @@ public class ManagerController {
 				Item item = newStockPane.getItemComboBox().getValue();
 				int quantity = Integer.parseInt(newStockPane.getStockQuantityField().getText());
 				double purchasePrice = Double.parseDouble(newStockPane.getPurchasePriceField().getText());
+				if(item == null || quantity == 0 || purchasePrice <= 0) {
+					throw new IllegalArgumentException("All fields must be filled");
+				}
 				FileHandler.addStock(item, quantity, purchasePrice);
 				pane.showItemsView();
 			} catch (NumberFormatException ex) {
@@ -218,6 +224,9 @@ public class ManagerController {
 			String email = newSupplierPane.getEmailField().getText();
 
 			try {
+				if(name.isEmpty() || phoneNumber.isEmpty() || email.isEmpty()) {
+					throw new IllegalArgumentException("All fields must be filled");
+				}
 				Supplier newSupplier = new Supplier(name, phoneNumber, email);
 				FileHandler.appendFile(FileHandler.SUPPLIER, newSupplier);
 				pane.showSuppliersView();
