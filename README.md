@@ -20,17 +20,16 @@ A Java + JavaFX desktop application for managing inventory, sales, and staff rol
 
 This project is built with a modular and object-oriented approach:
 
-**Model–View–Controller (MVC)** / clear separation:
+**Model-View-Controller (MVC)** / clear separation
 
-Models represent data (Item, User, Bill, etc.).
+## Screenshots
 
-Views are JavaFX UI.
+![Log In](src/images/log-in.jpeg)
 
-Controllers handle user interaction, events, and coordinate between UI and models.
+![Bills](src/images/bills.jpeg)
 
-Utility / Data Access Layer: File I/O, and helper routines.
+![New Bill](src/images/new-bill.jpeg)
 
-Role-based logic: Use of inheritance/abstraction or interfaces to let different roles share behavior or enforce 
-restrictions.
+![Manager](src/images/manager.jpeg)
 
-This design makes the code more maintainable, testable, and extendable.
+![Cashier Management](src/images/cashier-management.jpeg)
