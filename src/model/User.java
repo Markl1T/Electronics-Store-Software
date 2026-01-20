@@ -72,10 +72,19 @@ public abstract class User implements Serializable {
 	}
 	
 	public void setDateOfBirth(LocalDate dateOfBirth) throws InvalidDateException {
-		if(dateOfBirth.isAfter(LocalDate.now())) {
-			throw new InvalidDateException("Invalid Date");
-		}
-		this.dateOfBirth = dateOfBirth;
+	    if (dateOfBirth == null) {
+	        throw new InvalidDateException("Date of birth is required");
+	    }
+
+	    if (dateOfBirth.isAfter(LocalDate.now())) {
+	        throw new InvalidDateException("Invalid date");
+	    }
+
+	    if (dateOfBirth.isAfter(LocalDate.now().minusYears(18))) {
+	        throw new InvalidDateException("User must be at least 18 years old");
+	    }
+
+	    this.dateOfBirth = dateOfBirth;
 	}
 	
 	public double getCurrentSalary() {
