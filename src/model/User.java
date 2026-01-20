@@ -15,7 +15,7 @@ public abstract class User implements Serializable {
 	private LocalDate dateOfBirth;
 	private double currentSalary;
 	
-	public User(String username, String password, String name, String phoneNumber, String email,
+	protected User(String username, String password, String name, String phoneNumber, String email,
 			LocalDate dateOfBirth, double salary) throws InvalidSalaryException, InvalidEmailException, InvalidDateException {
 		this.username = username;
 		this.password = password;
@@ -54,12 +54,17 @@ public abstract class User implements Serializable {
 		return email;
 	}
 	
-	public void setEmail(String email) throws InvalidEmailException{
-		if (!(email.contains("@"))) {
-			throw new InvalidEmailException("Email should contain @ character");
-		}
-		else
-			this.email = email;
+	public void setEmail(String email) throws InvalidEmailException {
+	    if (email == null)
+	        throw new InvalidEmailException("Email cannot be null");
+
+	    String regex = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$";
+
+	    if (!email.matches(regex)) {
+	        throw new InvalidEmailException("Invalid email format");
+	    }
+
+	    this.email = email;
 	}
 	
 	public LocalDate getDateOfBirth() {
