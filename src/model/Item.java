@@ -45,7 +45,7 @@ public class Item implements Serializable {
 		return quantity;
 	}
 	
-	public void changeQuantity(int quantity) throws Exception{
+	public void changeQuantity(int quantity) throws InvalidQuantityException{
 		if ((this.quantity + quantity) < 0)
 			throw new InvalidQuantityException("Quantity added cannot be greater than current quantity");
 		else
@@ -69,7 +69,7 @@ public class Item implements Serializable {
 			return "No Stock";
 		}
 		else {
-			return "";
+			return String.valueOf(quantity);
 		}
 	}
 	
