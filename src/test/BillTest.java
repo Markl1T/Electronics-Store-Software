@@ -1,8 +1,15 @@
-package test.unit_testing;
+package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import model.Bill;
+import model.Cashier;
+import model.InvalidQuantityException;
+import model.Item;
+
 import static org.mockito.Mockito.*;
 
 class BillTest {
@@ -17,6 +24,30 @@ class BillTest {
     }
     
     // add item
+    @Test
+    void addItemEmptyBill() {
+        assertEquals(0, bill.getTotalQuantity());
+        assertEquals(0.0, bill.getTotalPrice(), 0.0001);
+        
+        assertTrue(bill.getItemList().isEmpty());
+        assertTrue(bill.getQuantityList().isEmpty());
+        assertTrue(bill.getPriceList().isEmpty());
+    }
+    
+    @Test
+    void addItemQuantityOne() throws Exception {
+        Bill bill = new Bill(mock(Cashier.class));
+        Item item = mock(Item.class);
+
+        when(item.getQuantity()).thenReturn(1);
+        when(item.getSellingPrice()).thenReturn(9.99);
+
+        bill.addItem(item, 1);
+
+        assertEquals(1, bill.getTotalQuantity());
+        assertEquals(9.99, bill.getTotalPrice(), 0.0001);
+    }
+    
     @Test
     void addItemWhenQuantityIsValid() throws Exception {
         Item item = mock(Item.class);
@@ -34,17 +65,22 @@ class BillTest {
         assertEquals(5.0, bill.getPriceList().get(0));
         assertEquals(3, bill.getQuantityList().get(0));
         
+        assertEquals(15.0, bill.getTotalPrice(), 0.0001);
     }
     
     @Test
-    void addItemAndIncreaseTotalPriceCorrectly() throws Exception {
+    void addItemAllowSameItemAddedMultipleTimes() throws Exception {
+        Bill bill = new Bill(mock(Cashier.class));
         Item item = mock(Item.class);
 
-        when(item.getQuantity()).thenReturn(20);
-        when(item.getSellingPrice()).thenReturn(2.5);
+        when(item.getQuantity()).thenReturn(10);
+        when(item.getSellingPrice()).thenReturn(2.0);
 
-        bill.addItem(item, 4);
+        bill.addItem(item, 2);
+        bill.addItem(item, 3);
 
+        assertEquals(2, bill.getItemList().size());
+        assertEquals(5, bill.getTotalQuantity());
         assertEquals(10.0, bill.getTotalPrice(), 0.0001);
     }
     
